@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
+#include "soc/spi_periph.h"
+//#include "hal/spi_types.h"
 
 SemaphoreHandle_t paramLock = NULL;
 #define SPI_PARAM_LOCK() \
@@ -64,6 +66,13 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
     ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg2, &spi_fifo));
 
     esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[SPI_CMT].spid_out, true, false);
+    //esp_rom_gpio_connect_in_signal(pin_sdio, spi_periph_signal[SPI_CMT].spiq_in, true);
+    //esp_rom_gpio_connect_out_signal(pin_clk, spi_periph_signal[SPI_CMT].spiclk_out, 0, 0);
+    //esp_rom_gpio_connect_out_signal(pin_cs, spi_periph_signal[SPI_CMT].spics_out[0], 0, 0);
+    //esp_rom_gpio_connect_out_signal(pin_fcs, spi_periph_signal[SPI_CMT].spics_out[1], 0, 0);
+    //esp_rom_gpio_connect_out_signal(pin_clk, spi_periph_signal[SPI_CMT].spicd_out, false, false);
+    //esp_rom_gpio_connect_out_signal(pin_, spi_periph_signal[SPI_CMT].spicd_out, false, false);
+
     delay(100);
 }
 

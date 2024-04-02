@@ -5,7 +5,6 @@
 #include "Led_Single.h"
 #include "Configuration.h"
 #include "Datastore.h"
-#include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "PinMapping.h"
 #include <Hoymiles.h>
@@ -84,7 +83,7 @@ void LedSingleClass::setLoop()
         }
 
         struct tm timeinfo;
-        if (getLocalTime(&timeinfo, 5) && (!config.Mqtt.Enabled || (config.Mqtt.Enabled && MqttSettings.getConnected()))) {
+        if (getLocalTime(&timeinfo, 5) && (!config.Mqtt.Enabled || (config.Mqtt.Enabled))) {
             _ledMode[0] = LedState_t::On;
         }
 
@@ -135,7 +134,7 @@ void LedSingleClass::setLed(const uint8_t ledNo, const bool ledState)
         return;
     }
 
-    const uint32_t currentPWM = ledcRead(analogGetChannel(pin.led[ledNo]));
+    const uint32_t currentPWM = ledcRead(pin.led[ledNo]);
     const uint32_t targetPWM = ledState ? pwmTable[config.Led_Single[ledNo].Brightness] : LED_OFF;
 
     if (currentPWM == targetPWM) {

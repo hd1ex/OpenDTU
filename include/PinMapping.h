@@ -1,6 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#ifndef ETH_PHY_TYPE
+#define ETH_PHY_TYPE        ETH_PHY_LAN8720
+#define ETH_PHY_ADDR         0
+#define ETH_PHY_MDC         -1
+#define ETH_PHY_MDIO        -1
+#define ETH_PHY_POWER       -1
+#define ETH_CLK_MODE        ETH_CLOCK_GPIO0_IN
+#endif
+
+#ifndef CONFIG_ETH_USE_ESP32_EMAC
+#define CONFIG_ETH_USE_ESP32_EMAC 1
+#endif
+
 #include <Arduino.h>
 #include <ETH.h>
 #include <stdint.h>

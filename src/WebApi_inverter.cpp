@@ -4,7 +4,6 @@
  */
 #include "WebApi_inverter.h"
 #include "Configuration.h"
-#include "MqttHandleHass.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "defaults.h"
@@ -44,7 +43,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 
             // Inverter Serial is read as HEX
             char buffer[sizeof(uint64_t) * 8 + 1];
-            snprintf(buffer, sizeof(buffer), "%0x%08x",
+            snprintf(buffer, sizeof(buffer), "%0lu%08lu",
                 ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
             obj["serial"] = buffer;
@@ -177,8 +176,6 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
             inv->Statistics()->setStringMaxPower(c, inverter->channel[c].MaxChannelPower);
         }
     }
-
-    MqttHandleHass.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -322,8 +319,6 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
             inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, inverter.channel[c].YieldTotalOffset);
         }
     }
-
-    MqttHandleHass.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -392,8 +387,6 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    MqttHandleHass.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)

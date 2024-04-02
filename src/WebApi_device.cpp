@@ -26,6 +26,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         return;
     }
 
+    #define MQTT_JSON_DOC_SIZE 10240
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();

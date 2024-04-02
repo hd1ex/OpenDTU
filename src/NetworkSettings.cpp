@@ -166,7 +166,7 @@ void NetworkSettingsClass::setupMode()
 
     if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+        // ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_clk_mode); // TODO: FIXME
     }
 }
 
@@ -206,7 +206,7 @@ void NetworkSettingsClass::loop()
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
             if (_adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
+                MessageOutput.printf("Admin AP remaining seconds: %lu / %lu\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
         _connectTimeoutTimer++;
