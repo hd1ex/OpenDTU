@@ -5,6 +5,7 @@
 #include "NetworkSettings.h"
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "NetworkEvents.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "defaults.h"
@@ -40,37 +41,37 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
     case ARDUINO_EVENT_ETH_START:
         MessageOutput.println("ETH start");
         if (_networkMode == network_mode::Ethernet) {
-            raiseEvent(network_event::NETWORK_START);
+            raiseEvent(network_event::NETWORK_START, event);
         }
         break;
     case ARDUINO_EVENT_ETH_STOP:
         MessageOutput.println("ETH stop");
         if (_networkMode == network_mode::Ethernet) {
-            raiseEvent(network_event::NETWORK_STOP);
+            raiseEvent(network_event::NETWORK_STOP, event);
         }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
         MessageOutput.println("ETH connected");
         _ethConnected = true;
-        raiseEvent(network_event::NETWORK_CONNECTED);
+        raiseEvent(network_event::NETWORK_CONNECTED, event);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
         MessageOutput.printf("ETH got IP: %s\r\n", ETH.localIP().toString().c_str());
         if (_networkMode == network_mode::Ethernet) {
-            raiseEvent(network_event::NETWORK_GOT_IP);
+            raiseEvent(network_event::NETWORK_GOT_IP, event);
         }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
         MessageOutput.println("ETH disconnected");
         _ethConnected = false;
         if (_networkMode == network_mode::Ethernet) {
-            raiseEvent(network_event::NETWORK_DISCONNECTED);
+            raiseEvent(network_event::NETWORK_DISCONNECTED, event);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
         MessageOutput.println("WiFi connected");
         if (_networkMode == network_mode::WiFi) {
-            raiseEvent(network_event::NETWORK_CONNECTED);
+            raiseEvent(network_event::NETWORK_CONNECTED, event);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
@@ -78,13 +79,13 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
             WiFi.reconnect();
-            raiseEvent(network_event::NETWORK_DISCONNECTED);
+            raiseEvent(network_event::NETWORK_DISCONNECTED, event);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
         MessageOutput.printf("WiFi got ip: %s\r\n", WiFi.localIP().toString().c_str());
         if (_networkMode == network_mode::WiFi) {
-            raiseEvent(network_event::NETWORK_GOT_IP);
+            raiseEvent(network_event::NETWORK_GOT_IP, event);
         }
         break;
     default:
@@ -100,17 +101,17 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event e
     NetworkEventCbList_t newEventHandler;
     newEventHandler.cb = cbEvent;
     newEventHandler.event = event;
-    _cbEventList.push_back(newEventHandler);
+    _cbEventList.push_back(std::move(newEventHandler));
     return true;
 }
 
-void NetworkSettingsClass::raiseEvent(const network_event event)
+void NetworkSettingsClass::raiseEvent(const network_event event, const arduino_event_id_t aevent)
 {
     for (uint32_t i = 0; i < _cbEventList.size(); i++) {
         const NetworkEventCbList_t entry = _cbEventList[i];
         if (entry.cb) {
             if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
-                entry.cb(event);
+                entry.cb(aevent);
             }
         }
     }
@@ -167,7 +168,7 @@ void NetworkSettingsClass::setupMode()
 
     if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+        //ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
     }
 }
 
@@ -183,7 +184,6 @@ String NetworkSettingsClass::getApName() const
 {
     return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
 }
-
 void NetworkSettingsClass::loop()
 {
     if (_ethConnected) {

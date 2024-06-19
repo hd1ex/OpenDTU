@@ -3,6 +3,8 @@
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
+#include <soc/spi_periph.h>
+
 SemaphoreHandle_t paramLock = NULL;
 #define SPI_PARAM_LOCK() \
     do {                 \

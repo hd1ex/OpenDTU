@@ -203,7 +203,7 @@ void MqttSettingsClass::publishGeneric(const String& topic, const String& payloa
 void MqttSettingsClass::init()
 {
     using std::placeholders::_1;
-    NetworkSettings.onEvent(std::bind(&MqttSettingsClass::NetworkEvent, this, _1));
+    //NetworkSettings.onEvent(std::bind(&MqttSettingsClass::NetworkEvent, this, _1));
 
     createMqttClientObject();
 }
